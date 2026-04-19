@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+target/
+dbt_packages/
+logs/
+.user.yml
+feast_repo/__pycache__/
+*.env
+secrets/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

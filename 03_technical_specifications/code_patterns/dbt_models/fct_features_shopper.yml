@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: fct_features_shopper
+    description: >
+      Shopper-level feature table. One row per shopper per snapshot_date.
+      Used by Fraud, Credit Risk, and Debt Collection models.
+      Owner: Data Engineering. Refresh: daily at 02:00 UTC via Airflow. Version: v1.
+    meta:
+      owner: data-engineering
+      domain: [fraud, credit_risk, debt_collection]
+      feature_version: v1
+      deprecated: false
+    columns:
+      - name: entity_id
+        description: Shopper UUID. Primary key.
+        tests: [not_null, unique]
+      - name: snapshot_date
+        description: Date this snapshot was computed. Always use for PIT joins — never join without this condition.
+        tests: [not_null]
+      - name: feature_version
+        description: Feature set version. Never update in place — create a new version.
+        tests:
+          - accepted_values:
+              values: [v1, v2]
+      - name: shopper_age
+        description: Shopper age in years as of snapshot_date.
+        tests:
+          - not_null
+          - accepted_range: { min_value: 18, max_value: 120 }
+        meta:
+          pii: true
+          gdpr_category: personal_data
+          access_role: ds_standard
+      - name: shopper_province
+        description: Shopper province at time of registration.
+        meta:
+          pii: true
+          gdpr_category: personal_data
+          access_role: ds_standard
+      - name: shopper_n_orders_30d
+        description: Number of orders placed in the 30 days prior to snapshot_date.
+        tests:
+          - not_null
+          - accepted_range: { min_value: 0 }
+        meta:
+          pii: false
+          access_role: ds_standard
+      - name: shopper_total_spend_30d
+        description: Total order value in the 30 days prior to snapshot_date.
+        tests:
+          - accepted_range: { min_value: 0 }
+        meta:
+          pii: false
+          access_role: ds_standard
+      # Bureau features — privileged access only
+      - name: bureau_score
+        description: Credit bureau score as of snapshot_date.
+        meta:
+          pii: true
+          gdpr_category: financial_personal_data
+          access_role: ds_privileged
