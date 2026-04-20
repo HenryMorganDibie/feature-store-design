@@ -8,8 +8,8 @@
 
 ## The Problem
 
-A DS team of 4–10 engineers across three ML domains (Fraud, Credit Risk, Debt Collection)
-was rebuilding the same features independently for every model. Estimated waste: **30–40%
+A DS team of 4â€“10 engineers across three ML domains (Fraud, Credit Risk, Debt Collection)
+was rebuilding the same features independently for every model. Estimated waste: **30â€“40%
 of DS feature engineering time**. No shared layer, no discovery, no versioning, no PIT
 correctness guarantees.
 
@@ -27,13 +27,13 @@ Shared features across all three domains before this project: **zero**.
 
 | # | Deliverable | What It Covers |
 |---|---|---|
-| [01](./01_build_vs_buy/) | Build vs Buy Recommendation | dbt-native vs Feast vs SageMaker FS — scored against client constraints |
+| [01](./01_build_vs_buy/) | Build vs Buy Recommendation | dbt-native vs Feast vs SageMaker FS â€” scored against client constraints |
 | [02](./02_architecture/) | Architecture Document | Storage, computation, SageMaker serving, catalog, monitoring, PIT strategy |
 | [03](./03_technical_specifications/) | Technical Specifications | dbt model patterns, S3 layout, snapshot strategy, metadata schema |
-| [04](./04_implementation_plan/) | Implementation Plan | Phased rollout — 10-week dbt-native or 16-week Feast path |
+| [04](./04_implementation_plan/) | Implementation Plan | Phased rollout â€” 10-week dbt-native or 16-week Feast path |
 | [05](./05_open_questions/) | Open Questions | All 10 architectural questions answered: PIT, versioning, PII, governance |
 
-Full documents (.docx) for deliverables 01 and 02 are in their respective folders.
+Full documents (.PDF) for deliverables 01 and 02 are in their respective folders.
 
 ---
 
@@ -56,7 +56,7 @@ Full documents (.docx) for deliverables 01 and 02 are in their respective folder
 | Decision | Rationale |
 |---|---|
 | dbt-native first | Zero new infra; DS team already knows SQL; fastest adoption path |
-| Entity-first tables | Same entity model Feast uses — migration is wrapping, not rebuilding |
+| Entity-first tables | Same entity model Feast uses â€” migration is wrapping, not rebuilding |
 | S3 as source of truth for snapshots | Feast offline store can point directly at this layout |
 | FeatureClient abstraction layer | Identical DS API for both backends; migration = zero notebook changes |
 | SageMaker batch transform integration | FeatureClient reads S3 directly from SageMaker notebooks and batch jobs |
@@ -65,7 +65,7 @@ Full documents (.docx) for deliverables 01 and 02 are in their respective folder
 
 ## Author
 
-**Henry Dibie** — Data Scientist & ML Systems Engineer
+**Henry Dibie** â€” Data Scientist & ML Systems Engineer
 [linkedin.com/in/kinghenrymorgan](https://linkedin.com/in/kinghenrymorgan) | [github.com/HenryMorganDibie](https://github.com/HenryMorganDibie)
 
 > *Client details redacted. All architecture, evaluation frameworks, and code patterns are original work.*
