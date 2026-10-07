@@ -2,83 +2,83 @@
 
 ## Overall Architecture
 
-\\\
+```
 +-----------------------------------------------------------------+
-¦                    SHARED — Both Approaches                      ¦
-¦                                                                  ¦
-¦  [Source Systems]  ?  Airbyte (3x daily)  ?  l0 Redshift        ¦
-¦                                                  ¦               ¦
-¦                                           Airflow + dbt          ¦
-¦                                                  ¦               ¦
-¦                                           l1 Silver              ¦
-¦                              (fact_orders, dim_shoppers, ...)    ¦
+â”‚                    SHARED - Both Approaches                      â”‚
+â”‚                                                                  â”‚
+â”‚  [Source Systems]  â†’  Airbyte (3x daily)  â†’  l0 Redshift        â”‚
+â”‚                                                  â”‚               â”‚
+â”‚                                           Airflow + dbt          â”‚
+â”‚                                                  â”‚               â”‚
+â”‚                                           l1 Silver              â”‚
+â”‚                              (fact_orders, dim_shoppers, ...)    â”‚
 +-----------------------------------------------------------------+
-                               ¦
+                               â”‚
               +----------------------------------+
-              ¦                                  ¦
+              â”‚                                  â”‚
    +----------?----------+            +----------?----------+
-   ¦   APPROACH A        ¦            ¦   APPROACH B        ¦
-   ¦   dbt-Native        ¦            ¦   Feast (OSS)       ¦
-   ¦                     ¦            ¦                     ¦
-   ¦  l3 Feature tables  ¦            ¦  S3 sources export  ¦
-   ¦  (Redshift + S3)    ¦            ¦  feast materialize  ¦
-   ¦                     ¦            ¦  Feast offline store¦
+   â”‚   APPROACH A        â”‚            â”‚   APPROACH B        â”‚
+   â”‚   dbt-Native        â”‚            â”‚   Feast (OSS)       â”‚
+   â”‚                     â”‚            â”‚                     â”‚
+   â”‚  l3 Feature tables  â”‚            â”‚  S3 sources export  â”‚
+   â”‚  (Redshift + S3)    â”‚            â”‚  feast materialize  â”‚
+   â”‚                     â”‚            â”‚  Feast offline storeâ”‚
    +---------------------+            +---------------------+
-              ¦                                  ¦
+              â”‚                                  â”‚
               +----------------------------------+
-                               ¦
+                               â”‚
                     FeatureClient (Python)
                     Identical DS-facing API
-                               ¦
+                               â”‚
                     +---------------------+
-                    ¦   Amazon SageMaker  ¦
-                    ¦  Notebooks/Training ¦
-                    ¦  Batch Transform    ¦
+                    â”‚   Amazon SageMaker  â”‚
+                    â”‚  Notebooks/Training â”‚
+                    â”‚  Batch Transform    â”‚
                     +---------------------+
-\\\
+```
 
 ## Point-in-Time Correctness
 
-\\\
+```
 APPROACH A: dbt-Native (Manual)
 ---------------------------------------------------------
 Time:   Jan 2023      Jul 2023      Jan 2024      Today
-          ¦               ¦             ¦            ¦
-          ¦         Order placed        ¦            ¦
-          ¦         Jul 2023 ----------?¦            ¦
-          ¦                             ¦            ¦
-          ¦    Daily Snapshots (S3)     ¦            ¦
-          ¦    ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦    ¦            ¦
-          ¦                             ¦            ¦
-          ¦    PIT join SQL:            ¦            ¦
-          ¦    AND s.snapshot_date      ¦            ¦
-          ¦      = DATE(order.created)  ¦            ¦
-          ¦                             ¦            ¦
-          ¦    ??  If this condition    ¦            ¦
-          ¦    is omitted ? LEAKAGE     ¦            ¦
-          ¦    (today's values used     ¦            ¦
-          ¦     for historical event)   ¦            ¦
+          â”‚               â”‚             â”‚            â”‚
+          â”‚         Order placed        â”‚            â”‚
+          â”‚         Jul 2023 ---------->â”‚            â”‚
+          â”‚                             â”‚            â”‚
+          â”‚    Daily Snapshots (S3)     â”‚            â”‚
+          â”‚    â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚â”‚    â”‚            â”‚
+          â”‚                             â”‚            â”‚
+          â”‚    PIT join SQL:            â”‚            â”‚
+          â”‚    AND s.snapshot_date      â”‚            â”‚
+          â”‚      = DATE(order.created)  â”‚            â”‚
+          â”‚                             â”‚            â”‚
+          â”‚       If this condition    â”‚            â”‚
+          â”‚    is omitted â†’ LEAKAGE     â”‚            â”‚
+          â”‚    (today's values used     â”‚            â”‚
+          â”‚     for historical event)   â”‚            â”‚
 
 APPROACH B: Feast (Native)
 ---------------------------------------------------------
 Time:   Jan 2023      Jul 2023      Jan 2024      Today
-          ¦               ¦             ¦            ¦
-          ¦         Order placed        ¦            ¦
-          ¦         Jul 2023            ¦            ¦
-          ¦                             ¦            ¦
-          ¦    entity_df:               ¦            ¦
-          ¦    entity_id = order-A      ¦            ¦
-          ¦    event_timestamp = Jul 23 ¦            ¦
-          ¦                ¦            ¦            ¦
-          ¦                ?            ¦            ¦
-          ¦    get_historical_features()¦            ¦
-          ¦    ? returns Jul 2023 values¦            ¦
-          ¦    structurally enforced ? ¦            ¦
-\\\
+          â”‚               â”‚             â”‚            â”‚
+          â”‚         Order placed        â”‚            â”‚
+          â”‚         Jul 2023            â”‚            â”‚
+          â”‚                             â”‚            â”‚
+          â”‚    entity_df:               â”‚            â”‚
+          â”‚    entity_id = order-A      â”‚            â”‚
+          â”‚    event_timestamp = Jul 23 â”‚            â”‚
+          â”‚                â”‚            â”‚            â”‚
+          â”‚                â–¼            â”‚            â”‚
+          â”‚    get_historical_features()â”‚            â”‚
+          â”‚    â†’ returns Jul 2023 valuesâ”‚            â”‚
+          â”‚    structurally enforced   â”‚            â”‚
+```
 
 ## S3 Layout
 
-\\\
+```
 APPROACH A: dbt-Native
 s3://[client]-feature-store/
   features/
@@ -109,7 +109,7 @@ s3://[client]-feature-store/
       shopper/event_timestamp=2026-04-01/part-00000.parquet
       order/event_timestamp=2026-04-01/part-00000.parquet
       merchant/event_timestamp=2026-04-01/part-00000.parquet
-\\\
+```
 "@
 
 New-File "02_architecture/.gitkeep" ""
@@ -120,9 +120,9 @@ New-File "02_architecture/.gitkeep" ""
 Write-Host "[4/7] 03_technical_specifications..." -ForegroundColor Yellow
 
 New-File "03_technical_specifications/README.md" @"
-# Deliverable 03 — Technical Specifications
+# Deliverable 03 - Technical Specifications
 
-**Effort:** ~4–5 hrs
+**Effort:** ~4â€“5 hrs
 
 ---
 

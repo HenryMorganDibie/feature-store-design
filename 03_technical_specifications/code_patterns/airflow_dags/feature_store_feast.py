@@ -1,10 +1,10 @@
 """
-Airflow DAG � Feast feature store pipeline
+Airflow DAG - Feast feature store pipeline
 Runs daily at 02:00 UTC.
 
 Pipeline:
-  wait_for_airbyte ? run_l1_dbt ? run_dbt_tests
-  ? export_l1_to_s3 ? feast_materialize ? alert_on_failure
+  wait_for_airbyte → run_l1_dbt → run_dbt_tests
+  → export_l1_to_s3 → feast_materialize → alert_on_failure
 
 feast materialize-incremental is idempotent: safe to re-run on failure.
 feast_materialize is blocked until dbt tests pass and S3 exports succeed.

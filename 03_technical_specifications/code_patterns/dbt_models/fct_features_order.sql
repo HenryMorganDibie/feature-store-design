@@ -28,7 +28,7 @@ SELECT
     -- Geographic features
     o.delivery_postal_code                                              AS geo_delivery_postal_code,
     o.distance_km                                                       AS geo_distance_km,
-    -- Temporal features (cyclical encodings — avoids discontinuity at hour 23 ? 0)
+    -- Temporal features (cyclical encodings - avoids discontinuity at hour 23 â†’ 0)
     SIN(2 * PI() * EXTRACT(HOUR FROM o.created_at) / 24)               AS temporal_hour_sin,
     COS(2 * PI() * EXTRACT(HOUR FROM o.created_at) / 24)               AS temporal_hour_cos,
     EXTRACT(DOW FROM o.created_at)                                      AS temporal_day_of_week

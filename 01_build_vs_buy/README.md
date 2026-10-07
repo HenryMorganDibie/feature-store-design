@@ -1,6 +1,6 @@
-# Deliverable 01 — Build vs Buy Recommendation
+# Deliverable 01 - Build vs Buy Recommendation
 
-**Effort:** ~3–4 hrs  
+**Effort:** ~3â€“4 hrs  
 **Full document:** See \FeatureStore_BuildVsBuy_Recommendation_PUBLIC.docx\ in this folder
 
 ---
@@ -19,16 +19,16 @@
 | Setup complexity | Low | Medium | Medium-High |
 | Team familiarity | High (SQL/dbt) | Low (new SDK) | Low-Medium |
 | Batch support | Native | Good | Good |
-| Online store (future) | ? Migration required | ? Config change only | ? Fully managed |
+| Online store (future) | Migration required | Config change only | Fully managed |
 | Operational overhead | Minimal | Medium | Low-Medium (AWS managed) |
-| Time to POC | 1–2 weeks | 3–5 weeks | 3–6 weeks |
-| Cost (batch-only) | ~\–13/month | ~\–10/month | Can escalate with volume |
+| Time to POC | 1â€“2 weeks | 3â€“5 weeks | 3â€“6 weeks |
+| Cost (batch-only) | ~\â€“13/month | ~\â€“10/month | Can escalate with volume |
 
 ---
 
 ## Weighted Scoring
 
-Weights reflect binding constraints: 1–2 person DE team, DS resistance to new tooling,
+Weights reflect binding constraints: 1â€“2 person DE team, DS resistance to new tooling,
 batch-only today, confirmed online store on the roadmap.
 
 | Criteria | Weight | dbt-Native | Feast | SageMaker FS |
@@ -45,19 +45,19 @@ batch-only today, confirmed online store on the roadmap.
 
 ## Why Not Feast Now
 
-- DS team has signalled low appetite for new tooling — Feast SDK adds friction at the moment adoption needs to be maximised
-- DE team of 1–2 cannot absorb the operational overhead of running a feature registry and online store
-- 3–5 week POC vs 1–2 weeks for dbt-native
+- DS team has signalled low appetite for new tooling - Feast SDK adds friction at the moment adoption needs to be maximised
+- DE team of 1â€“2 cannot absorb the operational overhead of running a feature registry and online store
+- 3â€“5 week POC vs 1â€“2 weeks for dbt-native
 
 ## Why Not SageMaker Feature Store
 
 - Per-write/read/storage billing can escalate quickly at scale
 - Console and SDK complexity the DE team doesn't need for batch-only
-- Harder to migrate off than dbt-native ? Feast
+- Harder to migrate off than dbt-native â†’ Feast
 
 ## Why dbt-Native Now
 
-- Zero new infrastructure — runs entirely in existing Airflow + dbt + Redshift + S3
+- Zero new infrastructure - runs entirely in existing Airflow + dbt + Redshift + S3
 - DS team already knows SQL; feature consumption via SELECT is the path of least resistance
 - FeatureClient can be extended in days, not weeks
 - GDPR/PII handled via existing Redshift IAM and column-level security

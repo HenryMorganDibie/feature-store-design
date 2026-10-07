@@ -1,5 +1,5 @@
 """
-FeatureClient — Feast backend
+FeatureClient - Feast backend
 Wraps the Feast Python SDK.
 DS-facing API is identical to the dbt-native backend.
 A migration from dbt-native to Feast requires only swapping this implementation.

@@ -1,5 +1,5 @@
 """
-FeatureClient — dbt-native backend
+FeatureClient - dbt-native backend
 Reads S3 Parquet snapshots via awswrangler.
 DS-facing API is identical to the Feast backend.
 A future migration to Feast requires zero changes to DS notebooks.
@@ -24,7 +24,7 @@ class FeatureClient:
         """
         Get features for a list of entity IDs as of a specific date.
         Defaults to the latest available snapshot if as_of_date is not provided.
-        PIT correctness is enforced here — DS never writes the join condition directly.
+        PIT correctness is enforced here - DS never writes the join condition directly.
         """
         snapshot = as_of_date or self._latest_snapshot(entity)
         df = wr.s3.read_parquet(

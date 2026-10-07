@@ -1,5 +1,5 @@
 """
-SageMaker training job — feature store integration
+SageMaker training job - feature store integration
 Shows how a SageMaker training script loads features
 via FeatureClient at the start of the training job.
 """

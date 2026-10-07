@@ -2,7 +2,7 @@
 
 ## Approach A: dbt-Native
 
-\\\
+```
 s3://[client]-feature-store/
   features/
     shopper/snapshot_date=YYYY-MM-DD/part-00000.parquet
@@ -14,11 +14,11 @@ s3://[client]-feature-store/
       debt_collection/snapshot_date=YYYY-MM-DD/part-00000.parquet
   registry/feature_metadata.json
   audit/quality_reports/
-\\\
+```
 
 ## Approach B: Feast
 
-\\\
+```
 s3://[client]-feature-store/
   feast/
     registry/registry.db
@@ -30,10 +30,10 @@ s3://[client]-feature-store/
       shopper/event_timestamp=YYYY-MM-DD/part-00000.parquet
       order/event_timestamp=YYYY-MM-DD/part-00000.parquet
       merchant/event_timestamp=YYYY-MM-DD/part-00000.parquet
-\\\
+```
 
 ## Retention Policy
 
-- 365 days at S3 Standard: ~\.72/month for ~292 GB
-- S3 Lifecycle rule to Glacier after 365 days (~\.004/GB/month)
+- 365 days at S3 Standard: ~$6.72/month for ~292 GB
+- S3 Lifecycle rule to Glacier after 365 days (~$0.004/GB/month)
 - Cost is identical regardless of dbt-native or Feast approach

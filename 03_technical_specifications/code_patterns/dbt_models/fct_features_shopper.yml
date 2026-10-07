@@ -16,10 +16,10 @@ models:
         description: Shopper UUID. Primary key.
         tests: [not_null, unique]
       - name: snapshot_date
-        description: Date this snapshot was computed. Always use for PIT joins — never join without this condition.
+        description: Date this snapshot was computed. Always use for PIT joins - never join without this condition.
         tests: [not_null]
       - name: feature_version
-        description: Feature set version. Never update in place — create a new version.
+        description: Feature set version. Never update in place - create a new version.
         tests:
           - accepted_values:
               values: [v1, v2]
@@ -53,7 +53,7 @@ models:
         meta:
           pii: false
           access_role: ds_standard
-      # Bureau features — privileged access only
+      # Bureau features - privileged access only
       - name: bureau_score
         description: Credit bureau score as of snapshot_date.
         meta:

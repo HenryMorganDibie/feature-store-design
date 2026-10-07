@@ -1,7 +1,7 @@
 -- Fraud training set
 -- PIT correctness: snapshot_date join is MANDATORY on every feature table join
 -- Omitting the snapshot_date condition silently uses today's feature values
--- for historical orders — this is data leakage that inflates training metrics
+-- for historical orders - this is data leakage that inflates training metrics
 
 {{ config(
     materialized='table',

@@ -1,5 +1,5 @@
 -- Feature store schema and access control
--- Reference only — adapt to your Redshift environment
+-- Reference only - adapt to your Redshift environment
 
 CREATE SCHEMA IF NOT EXISTS feature_store;
 

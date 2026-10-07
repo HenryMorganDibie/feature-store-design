@@ -1,5 +1,5 @@
 """
-SageMaker notebook — FeatureClient usage patterns
+SageMaker notebook - FeatureClient usage patterns
 Shows how DS engineers consume features in SageMaker notebooks
 for both exploratory analysis and training set preparation.
 """

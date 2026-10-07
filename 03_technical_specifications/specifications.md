@@ -18,7 +18,7 @@ Three entities drive the entire feature store. All feature tables follow this mo
 
 | Layer | Name | Purpose | Feature Store Role |
 |---|---|---|---|
-| l0 | Bronze | Raw Airbyte replicas | Source only — never queried directly in feature models |
+| l0 | Bronze | Raw Airbyte replicas | Source only - never queried directly in feature models |
 | l1 | Silver | Cleaned entities via dbt | Foundation for all feature computation |
 | l2 | Gold | KPIs and dashboard tables | Not consumed by feature store |
 | l3 | Feature | Entity feature tables | New layer added by this project |
@@ -45,25 +45,25 @@ Materialise as TABLE and refresh daily via Airflow.
 
 | Column | dbt-Native | Feast |
 |---|---|---|
-| Primary key | entity_id VARCHAR — consistent across all entity feature tables | entity_id VARCHAR — must match Feast Entity join_key exactly |
-| Timestamp | snapshot_date DATE — partition key for PIT joins | event_timestamp TIMESTAMP — required by Feast; drives all PIT joins |
-| Version | feature_version VARCHAR (v1, v2) — manual column in every record | Managed by FeatureView name versioning (shopper_features_v2) |
+| Primary key | entity_id VARCHAR - consistent across all entity feature tables | entity_id VARCHAR - must match Feast Entity join_key exactly |
+| Timestamp | snapshot_date DATE - partition key for PIT joins | event_timestamp TIMESTAMP - required by Feast; drives all PIT joins |
+| Version | feature_version VARCHAR (v1, v2) - manual column in every record | Managed by FeatureView name versioning (shopper_features_v2) |
 | Naming | category_featurename (e.g., shopper_n_orders_30d) | Same naming convention recommended for consistency |
 
 ---
 
 ## 5. Feature Naming Convention
 
-\\\
+```
 {entity}_{category}_{description}_{window}
 
 Examples:
-  shopper_n_orders_30d          ? shopper entity, count feature, 30-day window
-  shopper_total_spend_lifetime  ? shopper entity, sum feature, lifetime window
-  merchant_fraud_rate_60d       ? merchant entity, rate feature, 60-day window
-  order_temporal_hour_sin       ? order entity, temporal category, cyclical encoding
-  shopper_bureau_score          ? shopper entity, bureau category
-\\\
+  shopper_n_orders_30d          â†’ shopper entity, count feature, 30-day window
+  shopper_total_spend_lifetime  â†’ shopper entity, sum feature, lifetime window
+  merchant_fraud_rate_60d       â†’ merchant entity, rate feature, 60-day window
+  order_temporal_hour_sin       â†’ order entity, temporal category, cyclical encoding
+  shopper_bureau_score          â†’ shopper entity, bureau category
+```
 
 ---
 
@@ -71,8 +71,8 @@ Examples:
 
 | Scenario | Action | Notes |
 |---|---|---|
-| Adding a new feature column | Add to existing model — no version bump | Safe: additive change, no downstream breakage |
-| Changing feature calculation logic | Create v2 model, run in parallel for 2 weeks, deprecate v1 | Never update in place — silently breaks downstream consumers |
+| Adding a new feature column | Add to existing model - no version bump | Safe: additive change, no downstream breakage |
+| Changing feature calculation logic | Create v2 model, run in parallel for 2 weeks, deprecate v1 | Never update in place - silently breaks downstream consumers |
 | Renaming a feature | Add alias in v2, deprecate old name after migration window | Coordinate with DS team before deprecating |
 | Removing a feature | Set to NULL in current model, remove after confirmed zero usage | Query feature registry to verify zero usage before removing |
 
@@ -80,7 +80,7 @@ Examples:
 
 ## 7. Metadata Registry Schema
 
-\\\sql
+```sql
 CREATE TABLE feature_store.feature_registry (
     feature_id          VARCHAR(100)  NOT NULL,
     entity              VARCHAR(50)   NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE feature_store.feature_registry (
     created_at          TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (feature_id, feature_version)
 );
-\\\
+```
 
 ---
 
@@ -105,9 +105,9 @@ CREATE TABLE feature_store.feature_registry (
 
 | Retention | Cost at S3 Standard | Notes |
 |---|---|---|
-| 90 days | ~\.66/month | Minimum. Covers most retraining cycles. |
-| 365 days | ~\.72/month | Recommended: GDPR audit + multi-year model reproducibility. |
-| After 365 days | ~\.004/GB/month (Glacier) | S3 Lifecycle rule to Glacier. Automated via AWS. |
+| 90 days | ~$1.66/month | Minimum. Covers most retraining cycles. |
+| 365 days | ~$6.72/month | Recommended: GDPR audit + multi-year model reproducibility. |
+| After 365 days | ~$0.004/GB/month (Glacier) | S3 Lifecycle rule to Glacier. Automated via AWS. |
 
 **Recommendation:** 365-day retention at S3 Standard for both approaches.
 S3 Lifecycle rule to Glacier after 365 days. Storage cost is identical
@@ -121,7 +121,7 @@ When a feature definition changes, historical values must be recomputed.
 
 ### dbt-Native Backfill
 
-\\\ash
+```ash
 # Step 1: Update the feature logic in the dbt model
 # Step 2: Backfill the Redshift feature table across the full date range
 dbt run --models fct_features_shopper \
@@ -131,20 +131,20 @@ dbt run --models fct_features_shopper \
 python export_to_s3.py --entity shopper --start 2023-01-01 --end 2026-04-15
 
 # Step 4: Bump feature_version to v2
-# Estimated total time: 2–4 hours DE time
-\\\
+# Estimated total time: 2â€“4 hours DE time
+```
 
 ### Feast Backfill
 
-\\\ash
-# Steps 1–3: Same as dbt-native (rebuild l1, re-export to S3 sources)
+```ash
+# Steps 1â€“3: Same as dbt-native (rebuild l1, re-export to S3 sources)
 # Step 4: Re-materialise Feast offline store across the full date range
 feast materialize 2023-01-01T00:00:00 2026-04-15T00:00:00
-# Estimated total time: 4–8 hours DE time (extra S3 file generation step)
-\\\
+# Estimated total time: 4â€“8 hours DE time (extra S3 file generation step)
+```
 
 | Dimension | dbt-Native | Feast |
 |---|---|---|
-| Steps | 3 | 4–5 |
-| Estimated DE time | 2–4 hours | 4–8 hours |
+| Steps | 3 | 4â€“5 |
+| Estimated DE time | 2â€“4 hours | 4â€“8 hours |
 | Risk of corruption | Low (dbt transactions atomic per model) | Low (feast materialize is idempotent) |

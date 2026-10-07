@@ -1,10 +1,10 @@
 """
-Airflow DAG � dbt-native feature store pipeline
+Airflow DAG - dbt-native feature store pipeline
 Runs daily at 02:00 UTC.
 
 Pipeline:
-  wait_for_airbyte ? run_l1_dbt ? run_feature_dbt ? run_dbt_tests
-  ? export_to_s3 ? alert_on_failure
+  wait_for_airbyte → run_l1_dbt → run_feature_dbt → run_dbt_tests
+  → export_to_s3 → alert_on_failure
 
 S3 export is blocked until all dbt tests pass.
 Slack alert to #feature-store on any failure.

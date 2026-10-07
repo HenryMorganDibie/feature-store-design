@@ -1,5 +1,5 @@
 """
-SageMaker Batch Transform — feature store integration
+SageMaker Batch Transform - feature store integration
 Shows how batch inference jobs load features for scoring
 a full entity population (e.g., all active orders today).
 """
@@ -27,7 +27,7 @@ def prepare_batch_input(
         as_of_date=as_of_date,
     )
 
-    # Drop metadata columns — keep only model input features
+    # Drop metadata columns - keep only model input features
     drop_cols = ['snapshot_date', 'feature_version', 'created_at']
     feature_cols = [c for c in features_df.columns if c not in drop_cols]
     input_df = features_df[feature_cols]
@@ -39,7 +39,7 @@ def prepare_batch_input(
         path=s3_output_path,
         index=False,
     )
-    print(f"Batch input written: {len(input_df):,} rows ? {s3_output_path}")
+    print(f"Batch input written: {len(input_df):,} rows â†’ {s3_output_path}")
     return s3_output_path
 
 
